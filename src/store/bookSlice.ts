@@ -1,43 +1,39 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import axiosInstance from "../axiosConfig";
+import {BookModel} from "../models/bookModel";
 
-type TestState = {
-    isTestStarted: boolean;
-    isTestFinished: boolean;
-    sentences: string;
+type booksState = {
+    books: BookModel[];
 }
 
-const initialState: TestState = {
-    isTestStarted: false,
-    isTestFinished: false,
-    sentences: '4',
+const initialState: booksState = {
+    books: [],
 };
 
 const bookSlice = createSlice({
     name: 'bookSlice',
     initialState,
     reducers: {
-        setIsTestStarted(state, action: PayloadAction<boolean>) {
-            state.isTestStarted = action.payload;
-        },
-        setIsTestFinished(state, action: PayloadAction<boolean>) {
-            state.isTestFinished = action.payload;
-        },
-        setSentences(state, action: PayloadAction<string>) {
-            state.sentences = action.payload;
-        },
-        resetTestState(state) {
-            state.isTestStarted = false;
-            state.isTestFinished = false;
-            state.sentences = '4';
+        fetchGetBooks(state){
+            axiosInstance.get(`volumes`)
+                .then(res => {
+                    console.log('res.data.items', res.data.items);
+                    if (res.status === 200){
+                        state.books = res.data.items
+                    }
+
+                    //TODO Как првильно присваивать разные типы
+
+                    // console.log('res', res.data.items);
+                    // setData(res.data.items)
+                    // console.log('data', data)
+                })
         }
     }
 });
 
 export const {
-    setIsTestStarted,
-    setIsTestFinished,
-    setSentences,
-    resetTestState
+    fetchGetBooks
 } = bookSlice.actions;
 
 export default bookSlice.reducer;
