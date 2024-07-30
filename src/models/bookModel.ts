@@ -1,6 +1,6 @@
 import {VolumeInfoModel} from "./volumeInfoModel";
 
-export interface BookModel {
+export type BookModel = {
     id: string;
     volumeInfo: VolumeInfoModel
 }

@@ -13,9 +13,10 @@ const apiKey = process.env.REACT_APP_API_KEY;
 
 axiosInstance.interceptors.request.use(
     (config) => {
-        if (config.url) {
-            config.url = `${config.url}?q=fiction&key=${apiKey}`;
-        }
+        // if (config.url) {
+        //     config.url = `${config.url}?q=${config.params.q}&key=${apiKey}`;
+        // }
+        // console.log('config', config.url)
         return config;
     },
     (error) => {

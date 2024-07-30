@@ -1,39 +1,89 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import axiosInstance from "../axiosConfig";
 import {BookModel} from "../models/bookModel";
+import {BooksApi} from "../api";
 
 type booksState = {
     books: BookModel[];
+    isLoadingBooks: boolean;
+    countSearch: number | null
 }
 
-const initialState: booksState = {
+type paginationState = {
+    perPage: number;
+    currentPage: number;
+}
+
+type paramsFetchBooks = {
+    searchText: string | null,
+    category: string | null,
+    typeSort: string | null,
+    startIndex?: number,
+    maxResults?: number,
+}
+
+
+const initialState: booksState & paginationState = {
     books: [],
+    isLoadingBooks: false,
+    countSearch: null,
+    currentPage: 1,
+    perPage: 40,
 };
+
+// param: Param
+// const {startPage, xalypa} = param
+
+export const fetchBooks = createAsyncThunk('volumes', async () => {
+    // BooksApi.fetchAllBooks
+})
+
 
 const bookSlice = createSlice({
     name: 'bookSlice',
     initialState,
     reducers: {
-        fetchGetBooks(state){
-            axiosInstance.get(`volumes`)
-                .then(res => {
-                    console.log('res.data.items', res.data.items);
-                    if (res.status === 200){
-                        state.books = res.data.items
-                    }
+        incrementPage(state) {
+            state.countSearch && (state.countSearch += 1)
+        },
+        clearBooksState(state) {
+            state.books = []
+            state.isLoadingBooks = false
+            state.countSearch = null
+            state.currentPage = 1
+            state.perPage = 40
+        },
+    },
+    extraReducers(builder) {
+        builder
+            .addCase(fetchBooks.pending, (state, action) => {
+                state.isLoadingBooks = true
+            })
+            .addCase(fetchBooks.fulfilled, (state, action) => {
+                console.log(action)
+                if (action.payload?.data?.items) {
 
-                    //TODO Как првильно присваивать разные типы
+                    state.books.push(...action.payload.data.items)
+                    state.countSearch = action.payload.data.totalItems
+                } else {
+                    state.books = []
+                    state.countSearch = 0
+                }
 
-                    // console.log('res', res.data.items);
-                    // setData(res.data.items)
-                    // console.log('data', data)
-                })
-        }
+                state.isLoadingBooks = false
+            })
+            .addCase(fetchBooks.rejected, (state, action) => {
+                state.isLoadingBooks = false
+            })
     }
 });
 
 export const {
-    fetchGetBooks
+    incrementPage,
+    clearBooksState
 } = bookSlice.actions;
+
+
+
 
 export default bookSlice.reducer;
