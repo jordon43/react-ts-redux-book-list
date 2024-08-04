@@ -1,12 +1,9 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import BookCard from "../components/BookCardComponent/BookCard";
 import {useAppDispatch, useAppSelector} from "../hooks";
-import {BookModel} from "../models/bookModel";
-import {Button, TextField} from "@mui/material";
-import {clearBooksState, fetchBooks, incrementPage} from "../store/bookSlice";
-import {Search} from "@mui/icons-material";
-import SelectCategory from "../components/selectCategory";
-import SelectSort from "../components/BookCardComponent/selectSort";
+import {BookModel} from "../models/book.model";
+import {Box, Button} from "@mui/material";
+import {fetchBooks, incrementPage} from "../store/bookSlice";
 
 
 
@@ -50,96 +47,52 @@ const MainListPage: React.FC = () => {
     const dispatch = useAppDispatch();
     const booksState = useAppSelector((state) => state.bookSlice);
 
-    const [categoryInput, setCategoryInput] = useState<string>("all");
-    const [searchText, setSearchText] = useState<string>('')
-    const [sortValue, setSortValue] = useState<string>("relevance");
-
-
-    const getBooks = () => {
-        dispatch(fetchBooks(
-            {
-                searchText: searchText,
-                category: categoryInput,
-                typeSort: sortValue
-            }))
-    }
-
 //Сделать через useCallback and react.Memo itсиняк ytb
-    const handleChangeCategory = (value: any) => {
-        setCategoryInput(value)
-        dispatch(clearBooksState())
-        getBooks()
-
-    }
-
-    const handleChangeSort = (value: any) => {
-        setSortValue(value)
-        dispatch(clearBooksState())
-        getBooks()
-    }
 
     const loadMore = () => {
         dispatch(incrementPage())
-        getBooks()
+        dispatch(fetchBooks(booksState.params))
     }
 
     useEffect(() => {
-
-        getBooks()
+        dispatch(fetchBooks(booksState.params))
     }, [])
 
     return (
-        <div className="container mx-auto p-4" style={{
-            maxWidth: 1280,
-            flexDirection: 'column',
-            alignItems: 'center'
-        }}>
+        <Box
+            className="container mx-auto p-4"
+            style={{
+                maxWidth: 1280,
+                flexDirection: 'column',
+                alignItems: 'center'
+            }}
+        >
             {/*// div -> box/stack */}
-
-
-            <div className="">
+            <Box className="">
                 {booksState.countSearch ? `Найдено книг: ${booksState.countSearch}` : ''}
-            </div>
+            </Box>
 
+            <Box
+                className="cards"
+                style={{
+                    display: 'flex',
+                    gap: '15px',
+                    flexWrap: 'wrap'
+                }}
+            >
+                { booksState.books?.map((book: BookModel) => ( <BookCard book={book}/> )) }
 
-            <div className="cards" style={{
-                display: 'flex',
-                gap: '15px',
-                flexWrap: 'wrap'
-
-            }}>
-                {
-                    booksState.books?.map((book: BookModel) => (
-                            <BookCard book={book}/>
-                        )
-                    )
+                { !booksState.isLoadingBooks && booksState.countSearch && booksState.countSearch >= booksState.params.currentPage + booksState.params.perPage &&
+                    ( <Button onClick={loadMore}> Load More </Button> )
                 }
 
-                {
-                    !booksState.isLoadingBooks && (
-                        <Button onClick={loadMore}>
-                            Load More
-                        </Button>
-                    )
-                }
+            </Box>
+            { booksState.isLoadingBooks && ( <Box className=""> LOADING </Box> ) }
 
-            </div>
-            {
-                booksState.isLoadingBooks && (
-                    <div className="">
-                        LOADING
-                    </div>
-                )
+            { booksState?.books?.length === 0 && !booksState.isLoadingBooks &&
+                ( <Box className=""> Книг не найдено </Box> )
             }
-
-            {
-                booksState?.books?.length === 0 && !booksState.isLoadingBooks && (
-                    <div className="">
-                        Книг не найдено
-                    </div>
-                )
-            }
-        </div>
+        </Box>
     )
 }
 

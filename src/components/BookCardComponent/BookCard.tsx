@@ -1,6 +1,6 @@
 import React from "react";
 import {Link} from "react-router-dom";
-import {BookModel} from "../../models/bookModel";
+import {BookModel} from "../../models/book.model";
 import {Card, CardContent, CardMedia, Typography} from "@mui/material";
 
 const BookCard: React.FC<{book: BookModel}> = ({book}) => {

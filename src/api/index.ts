@@ -1,26 +1,10 @@
 import axiosInstance from "../axiosConfig";
-import {BookModel} from "../models/bookModel";
-
-
-//TODO вынести пагинацию
-
-type fetchAllBooksWithError = {
-    data: dataFetchBooks | null;
-    error?: string;
-}
-
-type paramsFetchBooks = {
-    searchText: string | null,
-    category: string | null,
-    typeSort: string | null,
-    startIndex?: number,
-    maxResults?: number,
-}
-
-type dataFetchBooks = {
-    totalItems: number;
-    items: BookModel[];
-}
+import {fetchAllBooksWithError} from "../models/fetchAllBooksWithError.model";
+import {dataFetchBooks} from "../models/dataFetchBooks.model";
+import {paramsFetchBooks} from "../models/paramsFetchBooks.model";
+import {fetchBookWithError} from "../models/fetchBookWithError.model";
+import axios from "axios";
+import {BookModel} from "../models/book.model";
 
 
 export class BooksApi {
@@ -29,19 +13,18 @@ export class BooksApi {
             searchText = '',
             category = '',
             typeSort = '',
-            startIndex = 1,
-            maxResults = 40,
+            currentPage = 1,
+            perPage = 40,
         } = params
-
+        console.log('startIndex, maxResults', currentPage, perPage)
         try{
             const params: any = {
                 q: (searchText && `intitle:${searchText}+`)+`${category !== 'all' && 'subject:'+category}`,
                 orderBy: typeSort,
-                startIndex: startIndex,
-                maxResults: maxResults,
+                startIndex: currentPage,
+                maxResults: perPage,
                 key: process.env.REACT_APP_API_KEY
             }
-
             const response = await axiosInstance.get<dataFetchBooks>('volumes', {params});
             return {
                 data: response.data
@@ -53,6 +36,21 @@ export class BooksApi {
                 data: null,
                 error: error instanceof Error ? error.message : 'unknown error'
             };
+        }
+    }
+    static async fetchBook (bookId: string): Promise<fetchBookWithError>  {
+        try {
+            const response = await axios.get<BookModel>(`https://www.googleapis.com/books/v1/volumes/${bookId}?key=${process.env.REACT_APP_API_KEY}`)
+            return {
+                data: response.data
+            }
+        }
+        catch (error) {
+            console.error(error)
+            return {
+                data: null,
+                error: error instanceof Error ? error.message : 'unknown error'
+            }
         }
     }
 }

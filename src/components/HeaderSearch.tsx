@@ -1,77 +1,62 @@
-import {Button, TextField} from "@mui/material";
+import {Box, Button, TextField, Typography} from "@mui/material";
 import {Search} from "@mui/icons-material";
-import SelectCategory from "./selectCategory";
-import SelectSort from "./BookCardComponent/selectSort";
-import React, {useState} from "react";
+import React from "react";
 import {useAppDispatch, useAppSelector} from "../hooks";
-import {clearBooksState, fetchBooks, incrementPage} from "../store/bookSlice";
+import {clearBooksState, fetchBooks, setCategory, setSearchText, setTypeSort} from "../store/bookSlice";
+// @ts-ignore
+import SelectCategory from "./SelectCategory";
+// @ts-ignore
+import SelectSort from "./BookCardComponent/SelectSort";
 
 
 const HeaderSearch = () => {
     const dispatch = useAppDispatch();
     const booksState = useAppSelector((state) => state.bookSlice);
 
-    const [categoryInput, setCategoryInput] = useState<string>("all");
-    const [searchText, setSearchText] = useState<string>('')
-    const [sortValue, setSortValue] = useState<string>("relevance");
-
-
-    const getBooks = () => {
-        dispatch(fetchBooks(
-            {
-                searchText: searchText,
-                category: categoryInput,
-                typeSort: sortValue
-            }))
-    }
-
 //Сделать через useCallback and react.Memo itсиняк ytb
-    const handleChangeCategory = (value: any) => {
-        setCategoryInput(value)
+    const handleChangeCategory = (value: string) => {
+        dispatch(setCategory(value))
         dispatch(clearBooksState())
-        getBooks()
-
+        dispatch(fetchBooks(booksState.params))
     }
 
-    const handleChangeSort = (value: any) => {
-        setSortValue(value)
+    const handleChangeSort = (value: string) => {
         dispatch(clearBooksState())
-        getBooks()
+        dispatch(setTypeSort(value))
+        dispatch(fetchBooks(booksState.params))
     }
-
-    const loadMore = () => {
-        dispatch(incrementPage())
-        getBooks()
+    
+    const searchBooks = () => {
+        dispatch(clearBooksState())
+        dispatch(fetchBooks(booksState.params))
     }
-
 
     return(
         <>
-            <h1 className="text-3xl font-bold mb-4 text-center">Search for books</h1>
-            <div className="searchBlock mx-auto text-center">
+            <Typography className="text-3xl font-bold mb-4 text-center">Search for books</Typography>
+            <Box className="searchBlock mx-auto text-center">
                 <TextField
-                    value={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
+                    value={booksState.params.searchText}
+                    onChange={(e) => dispatch(setSearchText(e.target.value))}
                 />
                 <Button
                     variant="contained"
                     color="primary"
-                    onClick={getBooks}
+                    onClick={searchBooks}
                 >
                     <Search/>
                 </Button>
-            </div>
-            <div className="filterBlock">
+            </Box>
+            <Box className="filterBlock">
                 <SelectCategory
-                    categoryInput={categoryInput}
+                    categoryInput={booksState.params.category}
                     handleChangeCategory={(value) => handleChangeCategory(value)}
                 />
                 <SelectSort
+                    sortValue={booksState.params.typeSort}
                     handleChangeSort={(value) => handleChangeSort(value)}
-                    sortValue={sortValue}
                 />
-
-            </div>
+            </Box>
         </>
     )
 }
