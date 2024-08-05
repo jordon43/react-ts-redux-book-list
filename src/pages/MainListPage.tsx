@@ -1,13 +1,9 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useLayoutEffect, useState} from "react";
 import BookCard from "../components/BookCardComponent/BookCard";
 import {useAppDispatch, useAppSelector} from "../hooks";
 import {BookModel} from "../models/book.model";
 import {Box, Button} from "@mui/material";
 import {fetchBooks, incrementPage} from "../store/bookSlice";
-
-
-
-
 
 
 // const selectSelf = (state: State) => state
@@ -47,6 +43,8 @@ const MainListPage: React.FC = () => {
     const dispatch = useAppDispatch();
     const booksState = useAppSelector((state) => state.bookSlice);
 
+
+    const [loading, setLoading] = useState<boolean>(false)
 //Сделать через useCallback and react.Memo itсиняк ytb
 
     const loadMore = () => {
@@ -54,9 +52,16 @@ const MainListPage: React.FC = () => {
         dispatch(fetchBooks(booksState.params))
     }
 
-    useEffect(() => {
+    useLayoutEffect(()=> {
         dispatch(fetchBooks(booksState.params))
     }, [])
+
+    // useEffect(() => {
+    //     // как сделать так чтобы был только один запрос
+    //
+    //     !loading && dispatch(fetchBooks(booksState.params))
+    //     setLoading(true)
+    // }, [])
 
     return (
         <Box
@@ -67,7 +72,6 @@ const MainListPage: React.FC = () => {
                 alignItems: 'center'
             }}
         >
-            {/*// div -> box/stack */}
             <Box className="">
                 {booksState.countSearch ? `Найдено книг: ${booksState.countSearch}` : ''}
             </Box>
@@ -80,7 +84,7 @@ const MainListPage: React.FC = () => {
                     flexWrap: 'wrap'
                 }}
             >
-                { booksState.books?.map((book: BookModel) => ( <BookCard book={book}/> )) }
+                { booksState.books?.map((book: BookModel) => ( <BookCard key={book.id} book={book}/> )) }
 
                 { !booksState.isLoadingBooks && booksState.countSearch && booksState.countSearch >= booksState.params.currentPage + booksState.params.perPage &&
                     ( <Button onClick={loadMore}> Load More </Button> )

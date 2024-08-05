@@ -16,7 +16,6 @@ export class BooksApi {
             currentPage = 1,
             perPage = 40,
         } = params
-        console.log('startIndex, maxResults', currentPage, perPage)
         try{
             const params: any = {
                 q: (searchText && `intitle:${searchText}+`)+`${category !== 'all' && 'subject:'+category}`,

@@ -6,11 +6,11 @@ import {fetchBookWithError} from "../models/fetchBookWithError.model";
 import {BookModel} from "../models/book.model";
 
 
-
 const BookInfoPage: React.FC = () => {
-    const { bookId } = useParams<{bookId: string}>()
 
+    const { bookId } = useParams<{bookId: string}>()
     const [bookInfo, setBookInfo] = useState<BookModel | null>(null)
+
 
     const fetchBook = async () => {
         if (bookId) {
@@ -31,7 +31,6 @@ const BookInfoPage: React.FC = () => {
         catch (error){
             console.error(error)
         }
-
     }, [])
 
     return(

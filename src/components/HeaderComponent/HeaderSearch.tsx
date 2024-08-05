@@ -1,17 +1,20 @@
 import {Box, Button, TextField, Typography} from "@mui/material";
 import {Search} from "@mui/icons-material";
 import React from "react";
-import {useAppDispatch, useAppSelector} from "../hooks";
-import {clearBooksState, fetchBooks, setCategory, setSearchText, setTypeSort} from "../store/bookSlice";
+import {useAppDispatch, useAppSelector} from "../../hooks";
+import {clearBooksState, fetchBooks, setCategory, setSearchText, setTypeSort} from "../../store/bookSlice";
 // @ts-ignore
 import SelectCategory from "./SelectCategory";
 // @ts-ignore
-import SelectSort from "./BookCardComponent/SelectSort";
+import SelectSort from "./SelectSort";
+import {useLocation, useNavigate} from "react-router-dom";
 
 
 const HeaderSearch = () => {
     const dispatch = useAppDispatch();
     const booksState = useAppSelector((state) => state.bookSlice);
+    const location = useLocation();
+    const navigate = useNavigate();
 
 //Сделать через useCallback and react.Memo itсиняк ytb
     const handleChangeCategory = (value: string) => {
@@ -27,6 +30,7 @@ const HeaderSearch = () => {
     }
     
     const searchBooks = () => {
+        location.pathname !== '/' && navigate('/')
         dispatch(clearBooksState())
         dispatch(fetchBooks(booksState.params))
     }

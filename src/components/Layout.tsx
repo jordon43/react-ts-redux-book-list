@@ -1,5 +1,5 @@
 import {Outlet} from "react-router-dom";
-import HeaderSearch from "./HeaderSearch";
+import HeaderSearch from "./HeaderComponent/HeaderSearch";
 
 
 const Layout = () => {

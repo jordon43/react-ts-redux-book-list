@@ -1,7 +1,8 @@
-import {AsyncThunk, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import {BookModel} from "../models/book.model";
 import {BooksApi} from "../api";
 import {fetchAllBooksWithError} from "../models/fetchAllBooksWithError.model";
+
 
 type booksState = {
     books: BookModel[];
@@ -18,20 +19,6 @@ type paramsFetchBooks = {
     currentPage: number;
 }
 
-const initialState: booksState = {
-    books: [],
-    isLoadingBooks: false,
-    countSearch: null,
-
-    params: {
-        searchText: '',
-        category: 'all',
-        typeSort: 'relevance',
-        currentPage: 1,
-        perPage: 40
-    },
-
-};
 
 export const fetchBooks = createAsyncThunk('volumes', async (params: paramsFetchBooks) => {
     const response: fetchAllBooksWithError  = await BooksApi.fetchAllBooks(params)
@@ -39,15 +26,26 @@ export const fetchBooks = createAsyncThunk('volumes', async (params: paramsFetch
 })
 
 
+const initialState: booksState = {
+    books: [],
+    isLoadingBooks: false,
+    countSearch: null,
+    params: {
+        searchText: '',
+        category: 'all',
+        typeSort: 'relevance',
+        currentPage: 1,
+        perPage: 40
+    }
+};
+
 const bookSlice = createSlice({
     name: 'bookSlice',
     initialState,
     reducers: {
         incrementPage(state) {
             if (state.countSearch && state.countSearch >= state.params.currentPage + state.params.perPage) {
-                console.log('sdgsdgsdgsdgsdgsdgsdgsg')
                 state.params.currentPage += state.params.perPage
-                console.log('state.params.currentPage', state.params.currentPage)
             }
         },
         clearBooksState(state) {
@@ -57,15 +55,12 @@ const bookSlice = createSlice({
             state.params.currentPage = 1
         },
         setCategory(state, action) {
-            console.log("action", action.payload)
             state.params.category = action.payload
         },
         setTypeSort(state, action){
-            console.log("action", action.payload)
             state.params.typeSort = action.payload
         },
         setSearchText(state, action) {
-            console.log("action", action.payload)
             state.params.searchText = action.payload
         }
     },
@@ -75,16 +70,13 @@ const bookSlice = createSlice({
                 state.isLoadingBooks = true
             })
             .addCase(fetchBooks.fulfilled, (state, action) => {
-                console.log(action)
                 if (action.payload?.data?.items) {
-
                     state.books.push(...action.payload.data.items)
                     state.countSearch = action.payload.data.totalItems
                 } else {
                     state.books = []
                     state.countSearch = 0
                 }
-
                 state.isLoadingBooks = false
             })
             .addCase(fetchBooks.rejected, (state, action) => {

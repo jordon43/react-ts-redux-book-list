@@ -1,16 +1,12 @@
 import React from "react";
 import {Link} from "react-router-dom";
 import {BookModel} from "../../models/book.model";
-import {Card, CardContent, CardMedia, Typography} from "@mui/material";
+import {Box, Card, CardContent, CardMedia, Typography} from "@mui/material";
 
 const BookCard: React.FC<{book: BookModel}> = ({book}) => {
     return(
-        <div className="w-1/3" style={{
-            flexBasis: '30%'
-        }}>
-            <Card
-                variant="outlined"
-            >
+        <Box className="w-1/3" style={{ flexBasis: '30%'}}>
+            <Card variant="outlined">
                 <CardMedia
                     component="img"
                     src={book.volumeInfo?.imageLinks?.smallThumbnail}
@@ -40,17 +36,7 @@ const BookCard: React.FC<{book: BookModel}> = ({book}) => {
                     }
                 </CardContent>
             </Card>
-
-
-
-            {/*<div className="cardBlock" >*/}
-            {/*    <img src="" alt="" style={{*/}
-            {/*        backgroundColor: "black",*/}
-            {/*    }}/>*/}
-            {/*    {book.volumeInfo.description}*/}
-            {/*    /!*<Link to={`/book/${book}`}>card </Link>*!/*/}
-            {/*</div>*/}
-        </div>
+        </Box>
     )
 }
 

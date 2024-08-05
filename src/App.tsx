@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {StrictMode} from 'react';
 import './App.css';
 import {BrowserRouter, createBrowserRouter, Route, RouterProvider, Routes} from "react-router-dom";
 import MainListPage from "./pages/MainListPage";
@@ -17,14 +17,9 @@ const router = createBrowserRouter([
 ])
 
 
-//outlet
-//     <Route element={<AppLayout />} path={'/olimp'}>
-//     <Route element={<OlimpListPage />} path={'olimp_list'} index={true} />
-// <Route element={<OlimpPage />} path={'olimp_list/:olimpId'}></Route>
-// <Route/>
-
 function App() {
     return (
+        <StrictMode>
         <div className="App">
             <BrowserRouter>
                 <Routes>
@@ -36,6 +31,7 @@ function App() {
             </BrowserRouter>
 
         </div>
+        </StrictMode>
     );
 }
 
