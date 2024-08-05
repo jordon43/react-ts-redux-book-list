@@ -1,38 +1,57 @@
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
-import axios from "axios";
+import {Box, Typography} from "@mui/material";
+import {BooksApi} from "../api";
+import {fetchBookWithError} from "../models/fetchBookWithError.model";
+import {BookModel} from "../models/book.model";
+
 
 const BookInfoPage: React.FC = () => {
+
     const { bookId } = useParams<{bookId: string}>()
+    const [bookInfo, setBookInfo] = useState<BookModel | null>(null)
 
-    const [bookInfo, setBookInfo]: any = useState({})
 
-    useEffect(() => {
-        axios.get(`https://www.googleapis.com/books/v1/volumes/${bookId}?key=${process.env.REACT_APP_API_KEY}`)
-            .then((res) => {
-                setBookInfo(res.data);
-                console.log('res', res.data)
-            })
+    const fetchBook = async () => {
+        if (bookId) {
+            const response: fetchBookWithError = await BooksApi.fetchBook(bookId);
+            return response;
+        }
+        return null
+    }
 
+    useEffect( () => {
+        try{
+            //как делать без then()
+            fetchBook()
+                .then(response => {
+                    response && setBookInfo(response?.data)
+                })
+        }
+        catch (error){
+            console.error(error)
+        }
     }, [])
 
     return(
-        <div className='container mx-auto flex'>
-            <div className="leftSide">
+        <Box className='container mx-auto flex'>
+            <Box className="leftSide w-1/4">
                 <img
+                    width={200}
+                    height={200}
                     src={bookInfo?.volumeInfo?.imageLinks?.thumbnail}
                 />
-            </div>
-            <div className="mainSide">
-                <p>{bookInfo?.volumeInfo?.categories && bookInfo?.volumeInfo?.categories[0]}</p>
-                <h1>{bookInfo?.volumeInfo?.title}</h1>
+            </Box>
+            <Box className="mainSide w-3/4 text-left">
+                <Typography className='font-bold'>{bookInfo?.volumeInfo?.categories && bookInfo?.volumeInfo?.categories[0]}</Typography>
+                <Typography>{bookInfo?.volumeInfo?.title}</Typography>
                 {bookInfo?.volumeInfo?.authors && bookInfo?.volumeInfo?.authors.map((author: any) => (
-                    <p>{author}</p>
+                    <Typography>{author}</Typography>
                 ))}
-                <p>{bookInfo?.volumeInfo?.description}</p>
-            </div>
+                <Typography>{bookInfo?.volumeInfo?.description}</Typography>
+            </Box>
 
-        </div>
+        </Box>
     )
 }
 

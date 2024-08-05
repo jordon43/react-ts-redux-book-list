@@ -7,16 +7,9 @@ type selectSortModel = {
     handleChangeSort: (sortValue: string) => void
 }
 
-const selectSort: React.FC<selectSortModel> = (
-    {
-        sortValue,
-        handleChangeSort
-    }
-) => {
-    const sortOption: Array<string> = [
-        'relevance',
-        'newest'
-    ]
+const selectSort: React.FC<selectSortModel> = (props) => {
+    const {sortValue, handleChangeSort} = props
+    const sortOption: Array<string> = ['relevance', 'newest']
     return (
         <Select
             label={'sort'}
